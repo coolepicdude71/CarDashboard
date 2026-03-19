@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# Settings
+num_blocks = 7
+max_acceleration = 100
+
+# Create figure
+fig, ax = plt.subplots(figsize=(3, 6))
+ax.set_xlim(0, 1)
+ax.set_ylim(0, num_blocks + 1)
+ax.axis('off')
+
+# Create block rectangles
+blocks = []
+for i in range(num_blocks):
+    rect = plt.Rectangle((0.25, i + 0.1), 0.5, 0.8,
+                         facecolor='lightgray',
+                         edgecolor='black',
+                         linewidth=1)
+    ax.add_patch(rect)
+    blocks.append(rect)
+
+# Border
+border = plt.Rectangle((0.2, 0), 0.6, num_blocks + 0.2,
+                       fill=False, edgecolor='black', linewidth=2)
+ax.add_patch(border)
+
+# Simulated acceleration (goes up and down)
+def get_acceleration(frame):
+    return (np.sin(frame * 0.1) + 1) / 2 * max_acceleration
+
+# Update function
+def update(frame):
+    accel = get_acceleration(frame)
+    t = accel / max_acceleration
+    active_blocks = int(t * num_blocks)
+
+    for i, rect in enumerate(blocks):
+        if i < active_blocks:
+            # Active blocks (red)
+            rect.set_facecolor((1, 0.2 + i*0.1, 0.2))
+        else:
+            # Inactive blocks (gray)
+            rect.set_facecolor('lightgray')
+
+    return blocks
+
+# Animate
+ani = FuncAnimation(fig, update, frames=200, interval=50)
+
+plt.show()
